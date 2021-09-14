@@ -11,6 +11,13 @@ def index(request):
 
 def process(request):
     if request.method == 'POST':
+        try:
+            all_query = Question.objects.all()
+            for one in all_query:
+                one.user_answer = None
+                one.save()
+        except:
+            print("No object in the database")
 
         li = []
 

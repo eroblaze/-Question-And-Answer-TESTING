@@ -1,0 +1,98 @@
+.wrong {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: 2px solid #7C7A7D;
+    border-radius: 5px;
+    margin: 0;
+    outline: none;
+    transition: 0.5s ease;
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.wrong:checked {
+    border-color: red;
+    background-color: red;
+}
+
+.wrong:checked:before {
+    position: absolute;
+    left: 2px;
+    top: -4px;
+    display: block;
+    content: '\2713';
+    text-align: center;
+    color: #FFF;
+}
+
+.answer {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: 2px solid #7C7A7D;
+    border-radius: 5px;
+    margin: 0;
+    outline: none;
+    transition: 0.5s ease;
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.answer:checked {
+    border-color: blue;
+    background-color: blue;
+}
+    
+.answer:checked:before {
+    position: absolute;
+    left: 2px;
+    top: -4px;
+    display: block;
+    content: '\2713';
+    text-align: center;
+    color: #FFF;
+}
+
+.correct {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: 2px solid #7C7A7D;
+    border-radius: 5px;
+    margin: 0;
+    outline: none;
+    transition: 0.5s ease;
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.correct:checked {
+    border-color: rgb(4, 163, 4);
+    background-color: rgb(4, 163, 4);
+}
+    
+.correct:checked:before {
+    position: absolute;
+    left: 2px;
+    top: -4px;
+    display: block;
+    content: '\2713';
+    text-align: center;
+    color: #FFF;
+}
