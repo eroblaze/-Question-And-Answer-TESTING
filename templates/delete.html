@@ -1,0 +1,13 @@
+{% extends 'index.html' %}
+
+{% block title %}Delete Page{% endblock title %}
+
+{% block content %}
+
+    <form action="{% url 'option:delete' %}" method="post">
+        {% csrf_token %}
+
+        <h2>Are you sure you want to delete every Question? <button type="submit" name="yes" value="yes">Yes</button> / <button name="yes" value="no" type="submit">No</button></h2>
+    </form>
+
+{% endblock content %}

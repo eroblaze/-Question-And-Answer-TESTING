@@ -88,6 +88,7 @@ class TestProcessView(TestCase):
         )
 
         self.process = reverse("option:process")
+        self.result = reverse("option:result")
 
     def test_process_view_renders_template_on_GET_request(self):
         """
@@ -134,6 +135,21 @@ class TestProcessView(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("option:result"))
+
+    def test_process_view_with_POST_data_while_database_is_empty(self):
+        """
+        Test if the database is empty, so that a user_ans should 
+        not be saved. It is only logical that there are questions
+        before a user can answer them.
+        """
+        Question.objects.all().delete()
+        response = self.client.post(
+            self.process, 
+            {'p-1-3': "checked"}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, self.result)
 
 
 class TestResultView(TestCase):
@@ -192,3 +208,145 @@ class TestResultView(TestCase):
         response = self.client.get(self.result)
 
         self.assertTemplateUsed(response, "result.html")
+
+
+class TestCreateView(TestCase):
+    @classmethod
+    def setUpTestData(self):
+        self.create = reverse("option:create")
+
+    def test_create_view_renders_create_template(self):
+        """
+        Test if the 'create view' renders the create.html
+        template on a GET request.
+        """
+        response = self.client.get(self.create)
+        
+        self.assertTemplateUsed(response, "create.html")
+        self.assertEqual(response.status_code, 200)
+
+    def test_create_view_creates_a_question_with_valid_data(self):
+        """
+        Test that the 'create view' will create a question when 
+        given a valid data
+        """
+        data = {
+            'question_text': "Name of phone?",
+            'option1': "Itel",
+            'option2': "iphone",
+            'option3': "samsung",
+            'option4': "techno",
+            'correct': "Itel",
+        }
+        response = self.client.post(self.create, data)
+        query_set = Question.objects.all()
+
+        self.assertEqual(len(query_set), 1)
+        self.assertEqual(query_set[0].question_text, "Name of phone?")
+        self.assertEqual(query_set[0].correct, "Itel")
+
+    def test_create_view_returns_an_error_with_invalid_data(self):
+        """
+        Test that 'create view' will return an error message 
+        when trying to create a question with incomplete data
+        """
+        data = {
+            'question_text': "Name of phone?",
+            'option1': "Itel",
+            'option2': "iphone",
+            'option3': "samsung",
+        }
+        response = self.client.post(self.create, data)
+
+        self.assertContains(response, "Incomplete Data")
+
+    def test_create_view_redirects_after_creating_question(self):
+        """
+        Test that the 'create view' will redirect to the same
+        question page with a success message after creating a question
+        """
+        data = {
+            'question_text': "Name of phone?",
+            'option1': "Itel",
+            'option2': "iphone",
+            'option3': "samsung",
+            'option4': "techno",
+            'correct': "Itel",
+        }
+        response = self.client.post(self.create, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Question Successfully Created")
+    
+    def test_create_view_receives_a_different_correct(self):
+        """
+        Test if a different option other than any of the ones
+        passed as options 1-4 is passed to create view.
+        If so, an error message should be returned 
+        else, continue.
+        """
+        data = {
+            'question_text': "Name of phone?",
+            'option1': "Itel",
+            'option2': "iphone",
+            'option3': "samsung",
+            'option4': "techno",
+            'correct': "toshiba",
+        }
+        response = self.client.post(self.create, data)
+
+        self.assertContains(response, "Invalid option for")
+
+
+class TestDeleteView(TestCase):
+    @classmethod
+    def setUpTestData(self):
+        self.delete = reverse("option:delete")
+        self.index = reverse("option:index")
+        self.create = reverse("option:create")
+
+        self.question1 = Question.objects.create(
+            question_text="What is my name?",
+        )
+        self.question1 = Question.objects.create(
+            question_text="What is my laptop's name?",
+        )
+        self.question1 = Question.objects.create(
+            question_text="What is my project's name?",
+        )
+
+    def test_delete_view_template_used(self):
+        """
+        Test 'delete view' remders the delete confirmation page
+        """
+        response = self.client.get(self.delete)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "delete.html")
+
+    def test_delete_view_with_YES_POST_request(self):
+        """
+        Test 'delete view' with a YES post request
+        """
+        query_set = Question.objects.all().count()
+        response = self.client.post(self.delete, {'yes': 'yes'})
+
+        new_query = Question.objects.all().count()
+
+        self.assertNotEqual(query_set, new_query)
+        self.assertEqual(new_query, 0)
+        self.assertRedirects(response, self.index)
+
+    def test_delete_view_with_NO_POST_request(self):
+        """
+        Test 'delete view' with a NO post request
+        """
+        query_set = Question.objects.all().count()
+        response = self.client.post(self.delete, {'yes': 'no'})
+
+        new_query = Question.objects.all().count()
+
+        self.assertEqual(query_set, new_query)
+        self.assertEqual(new_query, 3)
+        self.assertRedirects(response, self.create)
+    

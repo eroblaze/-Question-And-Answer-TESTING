@@ -4,6 +4,8 @@
 
 {% block content %}
 
+    <h3><a href="{% url 'option:index' %}"> << Home </a></h3>
+
     {% for object in query_set %}
 
     <h2>{{ forloop.counter }}. {{ object.question_text }}</h2>
@@ -14,7 +16,7 @@
 
                     <input type="checkbox" class="correct" checked> {{ choice.option }}
                     
-                {% elif choice.option == object.correct %}
+                {% elif choice.option == object.correct and object.user_answer %}
 
                     <input type="checkbox" class="answer" checked> {{ choice.option }}
 
